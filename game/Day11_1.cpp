@@ -31,6 +31,60 @@ int length;
 int currentTime;
 
 
+struct Brick {
+	int startPosX;
+	int startPosY;
+	unsigned int color;
+	int step;
+	bool right = true;
+	void draw() {
+		for (int i = startPosX;i < startPosX + 40;i++) {
+			for (int j = startPosY; j < startPosY + 10; j++) {
+				SetPixel(i, j, color);
+			}
+		}
+	}
+
+	void move() {
+		if (right) {
+			if (startPosX == 280 || GetPixel(startPosX + 40, startPosY) != BLACK) {
+				right = false;
+				return;
+			}
+			startPosX = startPosX + 1;
+			for (int j = startPosY; j < startPosY + 10;j++) {
+				SetPixel(startPosX + 39, j, color);
+			}
+
+			for (int j = startPosY; j < startPosY + 10;j++) {
+				SetPixel(startPosX - 1, j, BLACK);
+			}
+		}
+		else {
+
+			if (startPosX == 0 || GetPixel(startPosX - 1, startPosY) != BLACK) {
+				right = true;
+				return;
+			}
+			startPosX = startPosX - 1;
+
+			for (int j = startPosY; j < startPosY + 10;j++) {
+				SetPixel(startPosX, j, color);
+			}
+
+
+			for (int j = startPosY; j < startPosY + 10;j++) {
+				SetPixel(startPosX + 40, j, BLACK);
+			}
+
+		}
+	}
+
+};
+
+Brick b1;
+Brick b2;
+Brick list_brick[5][8];
 void draw_char(char c, int x, int y, unsigned int color) {
 	int posY = 0;
 
@@ -83,7 +137,7 @@ char* toString(int x) {
 
 void updateScore(int x) {
 
-	for (int i = 56; i < 90 ;i++) {
+	for (int i = 56; i < 90;i++) {
 		for (int j = 0; j < 8;j++) {
 			SetPixel(i, j, BLACK);
 		}
@@ -106,81 +160,122 @@ void updateLife(int x) {
 	}
 }
 
-
 void draw_brick() {
-
-	//Draw brick line 1,3,5
-	for (int i = 0;i < 8;i++) {
-		for (int j = i * 40; j < (i + 1) * 40; j++) {
-			for (int k = 20;k < 30;k++) {
-				if (i == 0 || i == 3 || i == 6) {
-					SetPixel(j, k, RED);
+	for (int i = 0;i < 5;i++) {
+		for (int j = 0;j < 8;j++) {
+			if ((i + j) % 2 == 0) {
+				if (j == 0 || j == 4) {
+					list_brick[i][j].startPosX = j * 40;
+					list_brick[i][j].startPosY = i * 10 + 20;
+					list_brick[i][j].color = RED;
+					list_brick[i][j].draw();
 				}
-				else if (i == 1 || i == 4 || i == 7) {
-					SetPixel(j, k, BLUE);
+				if (j == 2 || j == 6) {
+					list_brick[i][j].startPosX = j * 40;
+					list_brick[i][j].startPosY = i * 10 + 20;
+					list_brick[i][j].color = BLUE;
+					list_brick[i][j].draw();
 				}
-				else {
-					SetPixel(j, k, GREEN);
+				if (j == 1 || j == 5) {
+					list_brick[i][j].startPosX = j * 40;
+					list_brick[i][j].startPosY = i * 10 + 20;
+					list_brick[i][j].color = GREEN;
+					list_brick[i][j].draw();
 				}
-			}
-
-			for (int k = 40;k < 50;k++) {
-				if (i == 0 || i == 3 || i == 6) {
-					SetPixel(j, k, RED);
-				}
-				else if (i == 1 || i == 4 || i == 7) {
-					SetPixel(j, k, BLUE);
-				}
-				else {
-					SetPixel(j, k, GREEN);
-				}
-			}
-
-			for (int k = 60;k < 70;k++) {
-				if (i == 0 || i == 3 || i == 6) {
-					SetPixel(j, k, RED);
-				}
-				else if (i == 1 || i == 4 || i == 7) {
-					SetPixel(j, k, BLUE);
-				}
-				else {
-					SetPixel(j, k, GREEN);
-				}
-			}
-
-		}
-	}
-
-	//Draw brick line 2,4
-	for (int i = 0;i < 8;i++) {
-		for (int j = i * 40; j < (i + 1) * 40; j++) {
-			for (int k = 30;k < 40;k++) {
-				if (i == 0 || i == 3 || i == 6) {
-					SetPixel(j, k, BLUE);
-				}
-				else if (i == 1 || i == 4 || i == 7) {
-					SetPixel(j, k, GREEN);
-				}
-				else {
-					SetPixel(j, k, RED);
-				}
-			}
-
-			for (int k = 50;k < 60;k++) {
-				if (i == 0 || i == 3 || i == 6) {
-					SetPixel(j, k, BLUE);
-				}
-				else if (i == 1 || i == 4 || i == 7) {
-					SetPixel(j, k, GREEN);
-				}
-				else {
-					SetPixel(j, k, RED);
+				if (j == 3 || j == 7) {
+					list_brick[i][j].startPosX = j * 40;
+					list_brick[i][j].startPosY = i * 10 + 20;
+					list_brick[i][j].color = YELLOW;
+					list_brick[i][j].draw();
 				}
 			}
 		}
 	}
-
 }
+
+void move_all_brick() {
+	for (int i = 0;i < 5;i++) {
+		for (int j = 0;j < 8;j++) {
+			if ((i + j) % 2 == 0) {
+				list_brick[i][j].move();
+			}
+		}
+	}
+}
+//void draw_brick() {
+//
+//	Draw brick line 1,3,5
+//	for (int i = 0;i < 8;i++) {
+//		for (int j = i * 40; j < (i + 1) * 40; j++) {
+//			for (int k = 20;k < 30;k++) {
+//				if (i == 0 || i == 3 || i == 6) {
+//					SetPixel(j, k, RED);
+//				}
+//				else if (i == 1 || i == 4 || i == 7) {
+//					SetPixel(j, k, BLUE);
+//				}
+//				else {
+//					SetPixel(j, k, GREEN);
+//				}
+//			}
+//
+//			for (int k = 40;k < 50;k++) {
+//				if (i == 0 || i == 3 || i == 6) {
+//					SetPixel(j, k, RED);
+//				}
+//				else if (i == 1 || i == 4 || i == 7) {
+//					SetPixel(j, k, BLUE);
+//				}
+//				else {
+//					SetPixel(j, k, GREEN);
+//				}
+//			}
+//
+//			for (int k = 60;k < 70;k++) {
+//				if (i == 0 || i == 3 || i == 6) {
+//					SetPixel(j, k, RED);
+//				}
+//				else if (i == 1 || i == 4 || i == 7) {
+//					SetPixel(j, k, BLUE);
+//				}
+//				else {
+//					SetPixel(j, k, GREEN);
+//				}
+//			}
+//
+//		}
+//	}
+//
+//	Draw brick line 2,4
+//	for (int i = 0;i < 8;i++) {
+//		for (int j = i * 40; j < (i + 1) * 40; j++) {
+//			for (int k = 30;k < 40;k++) {
+//				if (i == 0 || i == 3 || i == 6) {
+//					SetPixel(j, k, BLUE);
+//				}
+//				else if (i == 1 || i == 4 || i == 7) {
+//					SetPixel(j, k, GREEN);
+//				}
+//				else {
+//					SetPixel(j, k, RED);
+//				}
+//			}
+//
+//			for (int k = 50;k < 60;k++) {
+//				if (i == 0 || i == 3 || i == 6) {
+//					SetPixel(j, k, BLUE);
+//				}
+//				else if (i == 1 || i == 4 || i == 7) {
+//					SetPixel(j, k, GREEN);
+//				}
+//				else {
+//					SetPixel(j, k, RED);
+//				}
+//			}
+//		}
+//	}
+//
+//}
 
 void draw_ball(int x, int y, unsigned int color) {
 	SetPixel(x, y, color);
@@ -465,13 +560,15 @@ void init() {
 	updateScore(score);
 	updateLife(life);
 	draw_brick();
+
+
 	draw_slide_bar(140, 40);
 	draw_ball(ballX, ballY, WHITE);
 }
 
 void play() {
 	while (true) {
-		if (life == 0) init();
+		if (life == 0 || score == 400) init();
 		int keyPressed = GetInput(false);
 		//Spacebar
 		if (keyPressed == 32) {
@@ -495,6 +592,8 @@ void play() {
 
 		if (gameStart) {
 			if (GetMilisec() >= (currentTime + speed)) {
+				BeginUpdate();
+				move_all_brick();
 				if (direction == 1) {
 					currentTime = GetMilisec();
 					upLeft();
@@ -520,6 +619,7 @@ void play() {
 					//start = move_slide_bar(start, true, length);
 
 				}
+				EndUpdate();
 			}
 
 		}
